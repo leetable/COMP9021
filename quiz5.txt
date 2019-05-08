@@ -1,0 +1,153 @@
+# Prompts the user for a positive integer that codes a set S as follows:
+# - Bit 0 codes 0
+# - Bit 1 codes -1
+# - Bit 2 codes 1
+# - Bit 3 codes -2
+# - Bit 4 codes 2
+# - Bit 5 codes -3
+# - Bit 6 codes 3
+# ...
+# Computes a derived positive integer that codes the set of running sums
+# of the members of S when those are listed in increasing order.
+#
+# Written by *** and Eric Martin for COMP9021
+
+
+from itertools import accumulate
+import sys
+
+try:
+    encoded_set = int(input('Input a positive integer: '))
+    if encoded_set < 0:
+        raise ValueError
+except ValueError:
+    print('Incorrect input, giving up.')
+    sys.exit()
+
+
+# POSSIBLY DEFINE OTHER FUNCTIONS
+## get encode set for code_derived_set
+##reverse String
+def string_reverse(string):
+    return string[::-1]
+
+def get_Bit_List(encoded_set):
+    binn = bin(encoded_set)
+
+    BitList = []
+    count = 0
+    for i in range(len(binn) - 2):
+        BitList.append(count)
+        if count >= 0:
+            count = count + 1
+            count = -count
+        else:
+            count = -count
+    return BitList
+
+
+
+def get_encode_List(encoded_set):
+    binn = bin(encoded_set)
+
+    BitList = get_Bit_List(encoded_set)
+    BinaryList = []
+    IndexList = []
+    EncodeList = []
+
+
+    for bit in range(len(binn)):
+        if bit <= 1:
+            continue
+        BinaryList.append(int(binn[bit]))
+    # reverse BinaryList
+    BinaryList = list(reversed(BinaryList))
+
+    for i in range(len(BinaryList)):
+        if BinaryList[i] == 1:
+            IndexList.append(i)
+
+    for i in range(len(BitList)):
+        for k in range(len(IndexList)):
+            if IndexList[k] == i:
+                EncodeList.append(BitList[i])
+    EncodeList = sorted(EncodeList)
+    return EncodeList
+
+##print encoded set
+def display_encoded_set(encoded_set):
+    if encoded_set==0:
+        print('{}')
+        return
+    L= get_encode_List(encoded_set)
+
+    Str = '{'
+    for i in L:
+        Str = Str + str(i)
+        Str = Str + ', '
+    Str = Str[:-2]
+    Str = Str + '}'
+    print(Str)
+
+
+##根据正整数算出与它具有相同编码集的数
+def code_derived_set(encoded_set):
+    encoded_running_sum = 0
+    if encoded_set == 0:
+        return encoded_running_sum
+    
+    
+      
+    L = get_encode_List(encoded_set)
+
+
+    Result = []
+    IndexList = []
+    Sum = 0
+    for i in range(len(L)):
+        Sum = Sum + L[i]
+        Result.append(Sum)
+
+    Result = list(set(Result))
+    BitList = []
+    count = 0
+    IndexList = []
+    while 1:
+        temp = 0
+        for i in range(len(Result)):
+            if Result[i] in BitList:
+                temp += 1
+        if temp == len(Result):
+            break
+        BitList.append(count)
+        if count >= 0:
+            count = count + 1
+            count = -count
+        else:
+            count = -count
+    for i in range(len(BitList)):
+        for k in range(len(Result)):
+            if Result[k] == BitList[i]:
+                IndexList.append(i)
+
+    BitNumber = max(IndexList) + 1
+    binary = ''
+
+    for i in range(BitNumber):
+        if i in IndexList:
+            binary = binary + '1'
+            continue
+        binary = binary + '0'
+    binary = string_reverse(binary)
+    encoded_running_sum = int(binary, 2)
+
+
+    return encoded_running_sum
+
+
+print('The encoded set is: ', end='')
+display_encoded_set(encoded_set)
+encoded_running_sum = code_derived_set(encoded_set)
+print('The derived encoded set is: ', end='')
+display_encoded_set(encoded_running_sum)
+print('  It is encoded by:', encoded_running_sum)

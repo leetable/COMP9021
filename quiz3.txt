@@ -1,0 +1,88 @@
+# Written by Eric Martin for COMP9021
+
+
+
+import sys
+from random import seed, randint, randrange
+
+
+try:
+    arg_for_seed, upper_bound, length =\
+            (int(x) for x in input('Enter three integers: ').split())
+except ValueError:
+    print('Incorrect input, giving up.')
+    sys.exit()
+#check list if equal or not ,if euql then return true
+def check(L):
+    return L[1:] == L[:-1]
+
+def length_of_longest_increasing_sequence(L):
+    if len(L)==0:
+        return 0
+    if len(L)==1:
+        return 1
+    if check(L):
+        return len(L)
+        
+    double_list = L * 2
+    sum = 0
+    t = 0
+    count = len(double_list)
+    maxSum=[]
+    while t != len(double_list)-1:
+        while count > 1:
+            if double_list[t + 1] >= double_list[t]:
+                sum = sum + 1
+                t=t+1
+                count = count-1
+            else:
+                maxSum.append(sum)
+                sum = 0
+                count = count - 1
+                t = t + 1
+                break
+    return max(maxSum)+1
+    
+    
+    # REPLACE pass ABOVE WITH  YOUR CODE
+
+def max_int_jumping_in(L):
+    Toint = 0
+    i = 0
+    Qindex = []
+    SumList = []
+    while i !=len(L):
+        tmp = i
+        line=""
+        while 1:
+            line = line +str(L[tmp])
+            Qindex.append(tmp)
+            tmp = L[tmp]
+            if tmp in Qindex:
+                #print(Qindex)
+                Qindex = []
+
+                break
+        i = i +1
+        Toint = int(line)
+        SumList.append(Toint)
+    #print(SumList)
+    return max(SumList)
+    # REPLACE pass ABOVE WITH  YOUR CODE
+        
+
+seed(arg_for_seed)
+L_1 = [randint(0, upper_bound) for _ in range(length)]
+print('L_1 is:', L_1)
+print('The length of the longest increasing sequence\n'
+      '  of members of L_1, possibly wrapping around, is:',
+      length_of_longest_increasing_sequence(L_1), end = '.\n\n'
+     )
+L_2 = [randrange(length) for _ in range(length)]
+print('L_2 is:', L_2)
+print('The maximum integer built from L_2 by jumping\n'
+      '  as directed by its members, from some starting member\n'
+      '  and not using any member more than once, is:',
+      max_int_jumping_in(L_2)
+     )
+

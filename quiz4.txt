@@ -1,0 +1,83 @@
+# Uses Heath Nutrition and Population statistics,
+# stored in the file HNP_Data.csv.gz,
+# assumed to be located in the working directory.
+# Prompts the user for an Indicator Name. If it exists and is associated with
+# a numerical value for some countries or categories, for some the years 1960-2015,
+# then finds out the maximum value, and outputs:
+# - that value;
+# - the years when that value was reached, from oldest to more recents years;
+# - for each such year, the countries or categories for which that value was reached,
+#   listed in lexicographic order.
+# 
+# Written by *** and Eric Martin for COMP9021
+
+
+import sys
+import os
+import csv
+import gzip
+
+
+filename = 'HNP_Data.csv.gz'
+if not os.path.exists(filename):
+    print(f'There is no file named {filename} in the working directory, giving up...')
+    sys.exit()
+
+indicator_of_interest = input('Enter an Indicator Name: ')
+
+first_year = 1960
+number_of_years = 56
+max_value = None
+countries_for_max_value_per_year = {}
+maxValueList= []
+EveryYear = []
+IndexList = []
+KeyValue = []
+
+with gzip.open(filename) as csvfile:
+    file = csv.reader(line.decode('utf8').replace('\0', '') for line in csvfile)
+    next(file)
+    for getlist in file:
+        if len(getlist)==0:
+            continue
+        #print(i[2])
+        if indicator_of_interest!=getlist[2]:
+            continue
+        for i in range(len(getlist)):
+            if i <4:
+                continue
+            if getlist[i]=='':
+                continue
+            maxValueList.append(float(getlist[i]))
+            EveryYear.append(first_year+i)
+            KeyValue.append(getlist[0])
+            #print(f'{first_year+i,float(getlist[i]),getlist[0]}')
+    if maxValueList==[]:
+        max_value = None
+    else:
+        max_value = max(maxValueList)
+        for index in range(len(maxValueList)):
+            if max_value == maxValueList[index]:
+                IndexList.append(index)
+      #  print(IndexList)
+        for k in range(len(IndexList)):
+            #print(IndexList[k])
+            countries_for_max_value_per_year.setdefault(EveryYear[IndexList[k]] - 4, []).append(
+                KeyValue[IndexList[k]])
+        #print(max_value)
+        if round(max_value,1) == round(max_value):
+            max_value = round(max_value)
+        else:
+            max_value = round(max_value,1)
+
+            
+if max_value is None:
+    print('Sorry, either the indicator of interest does not exist or it has no data.')
+else:
+    print('The maximum value is:', max_value)
+    print('It was reached in these years, for these countries or categories:')
+    #年份从数值上的小到大输出
+    print('\n'.join(f'    {year}: {countries_for_max_value_per_year[year]}'
+                                  for year in sorted(countries_for_max_value_per_year)
+                   )
+         )
